@@ -85,25 +85,12 @@ fi
 
 echo '--> install ARM-related env'
 sudo sh -c "echo '$platform_arch-mandriva-linux-gnueabi' > /etc/rpm/platform"
-sudo sh -c "echo ':arm:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-wrapper:' > /proc/sys/fs/binfmt_misc/register"
-
-
-# copy qemu binaries
-# it is big ugly hack
-# but i do now know another proper way
-# experiments with setup.spec was not successful
-
-(while [ ! -e  $tmpfs_path/openmandriva-2013.0-$platform_arch/root/usr/bin/ ]
-  do sleep 1;done
-  sudo cp $rpm_build_script_path/cooker/qemu*  $tmpfs_path/openmandriva-2013.0-$platform_arch/root/usr/bin/) &
-  subshellpid=$!
 
 # Build src.rpm
 echo '--> Build src.rpm'
 mock-urpm --buildsrpm --spec $tmpfs_path/SPECS/$spec_name --sources $tmpfs_path/SOURCES/ --resultdir $src_rpm_path --configdir $config_dir -v --no-cleanup-after $extra_build_src_rpm_options
 # Save exit code
 rc=$?
-kill $subshellpid
 echo '--> Done.'
 
 # Move all logs into the results dir.
